@@ -12,9 +12,7 @@ CREATE TABLE sys_action (
   t1_create_user_dir tinyint(4) DEFAULT '0' NOT NULL,
   t3_listPid int(11) DEFAULT '0' NOT NULL,
   t3_tables varchar(255) DEFAULT '' NOT NULL,
-  t4_recordsToEdit text,
-
-  KEY cruser_id (cruser_id)
+  t4_recordsToEdit text
 );
 
 #

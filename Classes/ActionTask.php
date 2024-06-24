@@ -56,26 +56,26 @@ class ActionTask implements TaskInterface
     /**
      * @var TaskModuleController
      */
-    protected $taskObject;
+    protected TaskModuleController $taskObject;
 
     /**
      * All hook objects get registered here for later use
      *
      * @var array
      */
-    protected $hookObjects = [];
+    protected array $hookObjects = [];
 
     /**
      * URL to task module
      *
      * @var string
      */
-    protected $moduleUrl;
+    protected string $moduleUrl;
 
     /**
      * @var IconFactory
      */
-    protected $iconFactory;
+    protected IconFactory $iconFactory;
     private PageRenderer $pageRenderer;
 
     /**
@@ -101,7 +101,7 @@ class ActionTask implements TaskInterface
      *
      * @return string The task as HTML
      */
-    public function getTask()
+    public function getTask(): string
     {
         $content = '';
         $show = (int)GeneralUtility::_GP('show');
@@ -164,7 +164,7 @@ class ActionTask implements TaskInterface
      *
      * @return string Overview as HTML
      */
-    public function getOverview()
+    public function getOverview(): string
     {
         $content = '<p>' . htmlspecialchars($this->getLanguageService()->getLL('description')) . '</p>';
         // Get the actions
@@ -187,7 +187,7 @@ class ActionTask implements TaskInterface
      *
      * @return array Array holding every needed information of a sys_action
      */
-    protected function getActions()
+    protected function getActions(): array
     {
         $backendUser = $this->getBackendUser();
         $actionList = [];
@@ -294,7 +294,7 @@ class ActionTask implements TaskInterface
      *
      * @return string List of sys_actions as HTML
      */
-    protected function renderActionList()
+    protected function renderActionList(): string
     {
         $content = '';
         // Get the sys_action records
@@ -336,7 +336,7 @@ class ActionTask implements TaskInterface
      * @param array $record sys_action record
      * @return string form to create a new user
      */
-    protected function viewNewBackendUser($record)
+    protected function viewNewBackendUser(array $record): string
     {
         $content = '';
         $beRec = BackendUtility::getRecord('be_users', (int)$record['t1_copy_of_user']);
@@ -456,7 +456,7 @@ class ActionTask implements TaskInterface
      * @param int $userId Id of the BE user
      * @param int $actionId Id of the action
      */
-    protected function deleteUser($userId, $actionId)
+    protected function deleteUser(int $userId, int $actionId)
     {
         GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('be_users')->update(
             'be_users',
@@ -475,7 +475,7 @@ class ActionTask implements TaskInterface
      * @param array $action sys_action record.
      * @return mixed The record of the BE user if found, otherwise FALSE
      */
-    protected function isCreatedByUser($id, $action)
+    protected function isCreatedByUser(int $id, array $action)
     {
         $record = BackendUtility::getRecord('be_users', $id, '*', ' AND cruser_id=' . $this->getBackendUser()->user['uid'] . ' AND createdByAction=' . $action['uid']);
         if (is_array($record)) {
@@ -491,7 +491,7 @@ class ActionTask implements TaskInterface
      * @param int $selectedUser Id of a selected user
      * @return string html list of users
      */
-    protected function getCreatedUsers($action, $selectedUser)
+    protected function getCreatedUsers(array $action, int $selectedUser): string
     {
         $content = '';
         $userList = [];
@@ -551,7 +551,11 @@ class ActionTask implements TaskInterface
      * @param int $userId Id of the user
      * @return string html link
      */
-    protected function action_linkUserName($username, $realName, $sysActionUid, $userId)
+    protected function action_linkUserName(
+        string $username,
+        string $realName,
+        int $sysActionUid,
+        int $userId): string
     {
         if (!empty($realName)) {
             $username .= ' (' . $realName . ')';
@@ -574,7 +578,7 @@ class ActionTask implements TaskInterface
      * @param array $vars POST vars
      * @return int Id of the new/updated user
      */
-    protected function saveNewBackendUser($record, $vars)
+    protected function saveNewBackendUser(array $record, array $vars): int
     {
         // Check if the usergroup is allowed
         $vars['usergroup'] = $this->fixUserGroup($vars['usergroup'] ?? [], $record);
@@ -646,7 +650,7 @@ class ActionTask implements TaskInterface
      * @param string $prefix Prefix
      * @return string Combined username
      */
-    protected function fixUsername($username, $prefix)
+    protected function fixUsername(string $username, string $prefix): string
     {
         $prefix = trim($prefix);
         if ($prefix !== '' && strpos($username, $prefix) === 0) {
@@ -662,7 +666,7 @@ class ActionTask implements TaskInterface
      * @param array $actionRecord The action record
      * @return array Cleaned array
      */
-    protected function fixUserGroup($appliedUsergroups, $actionRecord)
+    protected function fixUserGroup(array $appliedUsergroups, array $actionRecord): array
     {
         if (is_array($appliedUsergroups)) {
             $cleanGroupList = [];
@@ -713,7 +717,7 @@ class ActionTask implements TaskInterface
      * @param array $vars Selected be_user record
      * @return string Rendered user groups
      */
-    protected function getUsergroups($record, $vars)
+    protected function getUsergroups(array $record, array $vars): string
     {
         $content = '';
         // Do nothing if no groups are allowed
@@ -741,7 +745,7 @@ class ActionTask implements TaskInterface
      *
      * @param array $record sys_action record
      */
-    protected function viewNewRecord($record)
+    protected function viewNewRecord(array $record)
     {
         /** @var UriBuilder $uriBuilder */
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
@@ -761,7 +765,7 @@ class ActionTask implements TaskInterface
      * @param array $record sys_action record
      * @return string list of records
      */
-    protected function viewEditRecord($record)
+    protected function viewEditRecord(array $record): string
     {
         $content = '';
         $actionList = [];
@@ -812,7 +816,7 @@ class ActionTask implements TaskInterface
      * @param array $record sys_action record
      * @return string Result of the query
      */
-    protected function viewSqlQuery($record)
+    protected function viewSqlQuery(array $record): string
     {
         $content = '';
         if (ExtensionManagementUtility::isLoaded('lowlevel')) {
@@ -900,7 +904,7 @@ class ActionTask implements TaskInterface
      * @param array $record sys_action record
      * @return string list of records
      */
-    protected function viewRecordList($record)
+    protected function viewRecordList(array $record): string
     {
         $content = '';
         $id = (int)$record['t3_listPid'];
@@ -978,7 +982,10 @@ class ActionTask implements TaskInterface
      *
      * @throws Exception
      */
-    protected function addMessage($message, $title = '', $severity = AbstractMessage::OK)
+    protected function addMessage(
+        string $message, 
+        string $title = '', 
+        $severity = AbstractMessage::OK)
     {
         $flashMessage = GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $severity);
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
@@ -1003,7 +1010,7 @@ class ActionTask implements TaskInterface
      *
      * @return LanguageService
      */
-    protected function getLanguageService()
+    protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
     }
@@ -1013,7 +1020,7 @@ class ActionTask implements TaskInterface
      *
      * @return BackendUserAuthentication
      */
-    protected function getBackendUser()
+    protected function getBackendUser(): BackendUserAuthentication
     {
         return $GLOBALS['BE_USER'];
     }

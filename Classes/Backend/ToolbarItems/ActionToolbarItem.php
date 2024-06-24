@@ -36,14 +36,14 @@ class ActionToolbarItem implements ToolbarItemInterface
     /**
      * @var array
      */
-    protected $availableActions = [];
+    protected array $availableActions = [];
 
     /**
      * Render toolbar icon via Fluid
      *
      * @return string HTML
      */
-    public function getItem()
+    public function getItem(): string
     {
         return $this->getFluidTemplateObject('ToolbarItem.html')->render();
     }
@@ -53,7 +53,7 @@ class ActionToolbarItem implements ToolbarItemInterface
      *
      * @return string HTML
      */
-    public function getDropDown()
+    public function getDropDown(): string
     {
         $view = $this->getFluidTemplateObject('DropDown.html');
         $view->assign('actions', $this->availableActions);
@@ -63,7 +63,7 @@ class ActionToolbarItem implements ToolbarItemInterface
     /**
      * Stores the entries for the action menu in $this->availableActions
      */
-    protected function setAvailableActions()
+    protected function setAvailableActions(): void
     {
         $actionEntries = [];
         $backendUser = $this->getBackendUser();
@@ -143,7 +143,7 @@ class ActionToolbarItem implements ToolbarItemInterface
      *
      * @return array
      */
-    public function getAdditionalAttributes()
+    public function getAdditionalAttributes(): array
     {
         return [];
     }
@@ -153,7 +153,7 @@ class ActionToolbarItem implements ToolbarItemInterface
      *
      * @return bool
      */
-    public function hasDropDown()
+    public function hasDropDown(): bool
     {
         return true;
     }
@@ -163,7 +163,7 @@ class ActionToolbarItem implements ToolbarItemInterface
      *
      * @return bool
      */
-    public function checkAccess()
+    public function checkAccess(): bool
     {
         $this->setAvailableActions();
         return !empty($this->availableActions);
@@ -174,7 +174,7 @@ class ActionToolbarItem implements ToolbarItemInterface
      *
      * @return int
      */
-    public function getIndex()
+    public function getIndex(): int
     {
         return 35;
     }
@@ -184,7 +184,7 @@ class ActionToolbarItem implements ToolbarItemInterface
      *
      * @return BackendUserAuthentication
      */
-    protected function getBackendUser()
+    protected function getBackendUser(): BackendUserAuthentication
     {
         return $GLOBALS['BE_USER'];
     }

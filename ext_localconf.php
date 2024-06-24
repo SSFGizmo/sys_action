@@ -1,6 +1,8 @@
 <?php
 
-defined('TYPO3') or die();
+declare(strict_types=1);
+
+defined('TYPO3') || die();
 
 $GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][1435433113] = \TYPO3\CMS\SysAction\Backend\ToolbarItems\ActionToolbarItem::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['taskcenter']['sys_action'][\TYPO3\CMS\SysAction\ActionTask::class] = [
