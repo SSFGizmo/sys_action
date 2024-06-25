@@ -124,7 +124,7 @@ class ActionToolbarItem implements ToolbarItemInterface
 
         /** @var UriBuilder $uriBuilder */
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $result = $queryBuilder->execute();
+        $result = $queryBuilder->executeQuery();
         while ($actionRow = $result->fetchAssociative()) {
             $actionRow['link'] = sprintf(
                 '%s&SET[mode]=tasks&SET[function]=sys_action.%s&show=%u',

@@ -110,18 +110,20 @@ class ActionTask implements TaskInterface
                 $show = $hookObject->getTask($show, $this);
             }
         }
-
         // If no task selected, render the menu
         if ($show == 0) {
-            $content .= $this->taskObject->description($this->getLanguageService()->getLL('sys_action'), $this->getLanguageService()->getLL('description'));
+            $content .= $this->taskObject->description(
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:sys_action'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:description')
+            );
             $content .= $this->renderActionList();
         } else {
             $record = BackendUtility::getRecord('sys_action', $show);
             // If the action is not found
             if (empty($record)) {
                 $this->addMessage(
-                    $this->getLanguageService()->getLL('action_error-not-found'),
-                    $this->getLanguageService()->getLL('action_error'),
+                    $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error-not-found'),
+                    $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                     AbstractMessage::ERROR
                 );
             } else {
@@ -131,7 +133,7 @@ class ActionTask implements TaskInterface
                 switch ($record['type']) {
                     case 1:
                         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
-                        $pageRenderer->loadRequireJsModule('TYPO3/CMS/SysAction/ActionTask');
+                        #$pageRenderer->loadRequireJsModule('TYPO3/CMS/SysAction/ActionTask');
                         $content .= $this->viewNewBackendUser($record);
                         break;
                     case 2:
@@ -148,8 +150,8 @@ class ActionTask implements TaskInterface
                         break;
                     default:
                         $this->addMessage(
-                            $this->getLanguageService()->getLL('action_noType'),
-                            $this->getLanguageService()->getLL('action_error'),
+                            $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_noType'),
+                            $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                             AbstractMessage::ERROR
                         );
                         $content .= $this->renderFlashMessages();
@@ -166,7 +168,7 @@ class ActionTask implements TaskInterface
      */
     public function getOverview(): string
     {
-        $content = '<p>' . htmlspecialchars($this->getLanguageService()->getLL('description')) . '</p>';
+        $content = '<p>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:description')) . '</p>';
         // Get the actions
         $actionList = $this->getActions();
         if (!empty($actionList)) {
@@ -247,7 +249,7 @@ class ActionTask implements TaskInterface
         }
         /** @var UriBuilder $uriBuilder */
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $queryResult = $queryBuilder->execute();
+        $queryResult = $queryBuilder->executeQuery();
         while ($actionRow = $queryResult->fetchAssociative()) {
             $editActionLink = '';
 
@@ -263,7 +265,7 @@ class ActionTask implements TaskInterface
                     ]
                 );
 
-                $title = $this->getLanguageService()->getLL('edit-sys_action');
+                $title = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:edit-sys_action');
                 $icon = $this->iconFactory->getIcon('actions-open', Icon::SIZE_SMALL)->render();
                 $editActionLink = '<a class="btn btn-default btn-sm" href="' . htmlspecialchars($link) . '" title="' . htmlspecialchars($title) . '">';
                 $editActionLink .= $icon . ' ' . htmlspecialchars($title) . '</a>';
@@ -304,8 +306,8 @@ class ActionTask implements TaskInterface
             $content .= $this->taskObject->renderListMenu($actionList);
         } else {
             $this->addMessage(
-                $this->getLanguageService()->getLL('action_not-found-description'),
-                $this->getLanguageService()->getLL('action_not-found'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_not-found-description'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_not-found'),
                 AbstractMessage::INFO
             );
         }
@@ -321,7 +323,7 @@ class ActionTask implements TaskInterface
                 ]
             );
 
-            $title = $this->getLanguageService()->getLL('new-sys_action');
+            $title = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:new-sys_action');
             $content .= '<p>' .
                 '<a class="btn btn-default" href="' . htmlspecialchars($link) . '" title="' . htmlspecialchars($title) . '">' .
                 $this->iconFactory->getIcon('actions-add', Icon::SIZE_SMALL)->render() . ' ' . htmlspecialchars($title) .
@@ -343,8 +345,8 @@ class ActionTask implements TaskInterface
         // A record is need which is used as copy for the new user
         if (!is_array($beRec)) {
             $this->addMessage(
-                $this->getLanguageService()->getLL('action_notReady'),
-                $this->getLanguageService()->getLL('action_error'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 AbstractMessage::ERROR
             );
             $content .= $this->renderFlashMessages();
@@ -356,16 +358,16 @@ class ActionTask implements TaskInterface
             $errors = [];
             // Basic error checks
             if (!empty($vars['email']) && !GeneralUtility::validEmail($vars['email'])) {
-                $errors[] = $this->getLanguageService()->getLL('error-wrong-email');
+                $errors[] = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:error-wrong-email');
             }
             if (empty($vars['username'])) {
-                $errors[] = $this->getLanguageService()->getLL('error-username-empty');
+                $errors[] = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:error-username-empty');
             }
             if ($vars['key'] === 'NEW' && empty($vars['password'])) {
-                $errors[] = $this->getLanguageService()->getLL('error-password-empty');
+                $errors[] = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:error-password-empty');
             }
             if ($vars['key'] !== 'NEW' && !$this->isCreatedByUser($vars['key'], $record)) {
-                $errors[] = $this->getLanguageService()->getLL('error-wrong-user');
+                $errors[] = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:error-wrong-user');
             }
             foreach ($this->hookObjects as $hookObject) {
                 if (method_exists($hookObject, 'viewNewBackendUser_Error')) {
@@ -376,7 +378,7 @@ class ActionTask implements TaskInterface
             if (!empty($errors)) {
                 $this->addMessage(
                     implode(LF, $errors),
-                    $this->getLanguageService()->getLL('action_error'),
+                    $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                     AbstractMessage::ERROR
                 );
             } else {
@@ -384,11 +386,11 @@ class ActionTask implements TaskInterface
                 $key = $this->saveNewBackendUser($record, $vars);
                 // Success message
                 $message = $vars['key'] === 'NEW'
-                    ? $this->getLanguageService()->getLL('success-user-created')
-                    : $this->getLanguageService()->getLL('success-user-updated');
+                    ? $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:success-user-created')
+                    : $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:success-user-updated');
                 $this->addMessage(
                     $message,
-                    $this->getLanguageService()->getLL('success')
+                    $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:success')
                 );
             }
             $content .= $this->renderFlashMessages();
@@ -409,7 +411,7 @@ class ActionTask implements TaskInterface
         }
         $content .= '<form action="" class="panel panel-default" method="post" enctype="multipart/form-data">
                         <fieldset class="form-section">
-                            <h4 class="form-section-headline">' . htmlspecialchars($this->getLanguageService()->getLL('action_t1_legend_generalFields')) . '</h4>
+                            <h4 class="form-section-headline">' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_t1_legend_generalFields')) . '</h4>
                             <div class="form-group">
                                 <label for="field_disable">' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.disable')) . '</label>
                                 <input type="checkbox" id="field_disable" name="data[disable]" value="1" class="checkbox" ' . ((int)($vars['disable'] ?? 0) === 1 ? ' checked="checked" ' : '') . ' />
@@ -432,7 +434,7 @@ class ActionTask implements TaskInterface
                             </div>
                         </fieldset>
                         <fieldset class="form-section">
-                            <h4 class="form-section-headline">' . htmlspecialchars($this->getLanguageService()->getLL('action_t1_legend_configuration')) . '</h4>
+                            <h4 class="form-section-headline">' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_t1_legend_configuration')) . '</h4>
                             <div class="form-group">
                                 <label for="field_usergroup">' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:be_users.usergroup')) . '</label>
                                 <select id="field_usergroup" class="form-control" name="data[usergroup][]" multiple="multiple">
@@ -442,7 +444,7 @@ class ActionTask implements TaskInterface
                             <div class="form-group">
                                 <input type="hidden" name="data[key]" value="' . $key . '" />
                                 <input type="hidden" name="data[sent]" value="1" />
-                                <input class="btn btn-default" type="submit" value="' . htmlspecialchars($this->getLanguageService()->getLL($key === 'NEW' ? 'action_Create' : 'action_Update')) . '" />
+                                <input class="btn btn-default" type="submit" value="' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:' . $key === 'NEW' ? 'action_Create' : 'action_Update')) . '" />
                             </div>
                         </fieldset>
                     </form>';
@@ -517,7 +519,7 @@ class ActionTask implements TaskInterface
                 )
             )
             ->orderBy('username')
-            ->execute();
+            ->executeQuery();
 
         // Render the user records
         while ($row = $res->fetchAssociative()) {
@@ -534,7 +536,7 @@ class ActionTask implements TaskInterface
         if (!empty($userList)) {
             $content .= '<div class="panel panel-default">';
             $content .= '<div class="panel-heading">';
-            $content .= '<h3 class="panel-title">' . htmlspecialchars($this->getLanguageService()->getLL('action_t1_listOfUsers')) . '</h3>';
+            $content .= '<h3 class="panel-title">' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_t1_listOfUsers')) . '</h3>';
             $content .= '</div>';
             $content .= '<ul class="list-group">' . implode($userList) . '</ul>';
             $content .= '</div>';
@@ -565,7 +567,9 @@ class ActionTask implements TaskInterface
         $link = '<a href="' . htmlspecialchars($href) . '">' . htmlspecialchars($username) . '</a>';
         // Link to delete the user record
         $link .= '
-				<a href="' . htmlspecialchars($href . '&delete=1') . '" class="t3js-confirm-trigger" data-title="' . htmlspecialchars($this->getLanguageService()->getLL('lDelete_warning_title')) . '" data-message="' . htmlspecialchars($this->getLanguageService()->getLL('lDelete_warning')) . '">'
+                <a href="' . htmlspecialchars($href . '&delete=1') . '" class="t3js-confirm-trigger" data-title="'
+                . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:lDelete_warning_title'))
+                . '" data-message="' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:lDelete_warning')) . '">'
                     . $this->iconFactory->getIcon('actions-edit-delete', Icon::SIZE_SMALL)->render() .
                 '</a>';
         return $link;
@@ -845,7 +849,7 @@ class ActionTask implements TaskInterface
                         // If the result is rendered as csv or xml, show a download link
                         if ($type === 'csv' || $type === 'xml') {
                             $actionContent .= '<a href="' . htmlspecialchars(GeneralUtility::getIndpEnv('REQUEST_URI') . '&download_file=1') . '">'
-                                . '<strong>' . htmlspecialchars($this->getLanguageService()->getLL('action_download_file')) . '</strong></a>';
+                                . '<strong>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_download_file')) . '</strong></a>';
                         }
                     } catch (DBALException $e) {
                         $actionContent .= $e->getMessage();
@@ -854,8 +858,8 @@ class ActionTask implements TaskInterface
                     // Query is empty (not built)
                     $queryIsEmpty = true;
                     $this->addMessage(
-                        $this->getLanguageService()->getLL('action_emptyQuery'),
-                        $this->getLanguageService()->getLL('action_error'),
+                        $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_emptyQuery'),
+                        $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                         AbstractMessage::ERROR
                     );
                     $content .= $this->renderFlashMessages();
@@ -867,21 +871,20 @@ class ActionTask implements TaskInterface
                     }
                     /** @var UriBuilder $uriBuilder */
                     $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-                    $actionContent .= '<a title="' . htmlspecialchars($this->getLanguageService()->getLL('action_editQuery')) . '" class="btn btn-default" href="'
+                    $actionContent .= '<a title="' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_editQuery')) . '" class="btn btn-default" href="'
                         . htmlspecialchars((string)$uriBuilder->buildUriFromRoute('system_dbint')
                             . '&id=' . '&SET[function]=search' . '&SET[search]=query'
                             . '&storeControl[STORE]=-' . $record['uid'] . '&storeControl[LOAD]=1')
                         . '">'
                         . $this->iconFactory->getIcon('actions-open', Icon::SIZE_SMALL)->render() . ' '
-                        . $this->getLanguageService()->getLL(($queryIsEmpty ? 'action_createQuery'
-                        : 'action_editQuery')) . '</a>';
+                        . $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:' . $queryIsEmpty ? 'action_createQuery' : 'action_editQuery') . '</a>';
                 }
-                $content .= '<h2>' . htmlspecialchars($this->getLanguageService()->getLL('action_t2_result')) . '</h2>' . $actionContent;
+                $content .= '<h2>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_t2_result')) . '</h2>' . $actionContent;
             } else {
                 // Query is not configured
                 $this->addMessage(
-                    $this->getLanguageService()->getLL('action_notReady'),
-                    $this->getLanguageService()->getLL('action_error'),
+                    $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
+                    $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                     AbstractMessage::ERROR
                 );
                 $content .= $this->renderFlashMessages();
@@ -889,8 +892,8 @@ class ActionTask implements TaskInterface
         } else {
             // Required sysext lowlevel is not installed
             $this->addMessage(
-                $this->getLanguageService()->getLL('action_lowlevelMissing'),
-                $this->getLanguageService()->getLL('action_error'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_lowlevelMissing'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 AbstractMessage::ERROR
             );
             $content .= $this->renderFlashMessages();
@@ -911,8 +914,8 @@ class ActionTask implements TaskInterface
         $table = $record['t3_tables'];
         if ($id == 0) {
             $this->addMessage(
-                $this->getLanguageService()->getLL('action_notReady'),
-                $this->getLanguageService()->getLL('action_error'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 AbstractMessage::ERROR
             );
             $content .= $this->renderFlashMessages();
@@ -936,18 +939,18 @@ class ActionTask implements TaskInterface
         // If there is access to the page, then render the list contents and set up the document template object:
         if ($access) {
             $this->getLanguageService()->includeLLFile('EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/Recordlist');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/RecordDownloadButton');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/ClearCache');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/RecordSearch');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ColumnSelectorButton');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/MultiRecordSelection');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ClipboardPanel');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/NewContentElementWizardButton');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/Recordlist');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/RecordDownloadButton');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/ClearCache');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Recordlist/RecordSearch');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ColumnSelectorButton');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/MultiRecordSelection');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ClipboardPanel');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/NewContentElementWizardButton');
             $this->pageRenderer->addInlineLanguageLabelFile('EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/Element/ImmediateActionElement');
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ContextMenu');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/Element/ImmediateActionElement');
+            #$this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ContextMenu');
 
             // Initialize the dblist object:
             $dblist = GeneralUtility::makeInstance(ActionList::class);
@@ -966,8 +969,8 @@ class ActionTask implements TaskInterface
         } else {
             // Not enough rights to access the list view or the page
             $this->addMessage(
-                $this->getLanguageService()->getLL('action_error-access'),
-                $this->getLanguageService()->getLL('action_error'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error-access'),
+                $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 AbstractMessage::ERROR
             );
             $content .= $this->renderFlashMessages();
@@ -983,8 +986,8 @@ class ActionTask implements TaskInterface
      * @throws Exception
      */
     protected function addMessage(
-        string $message, 
-        string $title = '', 
+        string $message,
+        string $title = '',
         $severity = AbstractMessage::OK)
     {
         $flashMessage = GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $severity);
