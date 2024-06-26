@@ -205,8 +205,9 @@ class ActionToolbarItem implements ToolbarItemInterface
         ]);
         $view->setTemplateRootPaths(['EXT:sys_action/Resources/Private/Templates/ToolbarItems']);
         $view->setTemplate($filename);
-
-        $view->getRequest()->setControllerExtensionName('SysAction');
+        if ($view->getRequest() != null) {
+            $view->getRequest()->setControllerExtensionName('SysAction');
+        }
         return $view;
     }
 }
