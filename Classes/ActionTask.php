@@ -353,7 +353,8 @@ class ActionTask implements TaskInterface
             $content .= $this->renderFlashMessages();
             return $content;
         }
-        $vars = GeneralUtility::_POST('data');
+        $vars = $this->taskObject->getRequest()?->getParsedBody()['data'] ?? [];
+
         $key = 'NEW';
         if ((int)($vars['sent'] ?? 0) === 1) {
             $errors = [];
@@ -396,11 +397,13 @@ class ActionTask implements TaskInterface
             }
             $content .= $this->renderFlashMessages();
         }
+
         $beUsersUid = (int)($this->taskObject->getRequest()?->getQueryParams()['show'] ?? 0);
         // Load BE user to edit
         if ($beUsersUid > 0) {
             // Check if the selected user is created by the current user
             $rawRecord = $this->isCreatedByUser($beUsersUid, $record);
+            //@TODO
             if ($rawRecord) {
                 // Delete user
                 if ((int)($this->taskObject->getRequest()?->getQueryParams()['delete'] ?? 0) == 1) {
@@ -410,6 +413,7 @@ class ActionTask implements TaskInterface
                 $vars = $rawRecord;
             }
         }
+        
         $content .= '<form action="" class="panel panel-default" method="post" enctype="multipart/form-data">
                         <fieldset class="form-section">
                             <h4 class="form-section-headline">' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_t1_legend_generalFields')) . '</h4>
@@ -449,7 +453,7 @@ class ActionTask implements TaskInterface
                             </div>
                         </fieldset>
                     </form>';
-        $content .= $this->getCreatedUsers($record, $key);
+        $content .= $this->getCreatedUsers($record, (string)$key);
         return $content;
     }
 
@@ -466,9 +470,8 @@ class ActionTask implements TaskInterface
             ['deleted' => 1, 'tstamp' => (int)GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')],
             ['uid' => (int)$userId]
         );
-
         // redirect to the original task
-        HttpUtility::redirect($this->moduleUrl . '&show=' . (int)$actionId);
+        $this->taskObject->getResponseFactory()->createResponse(303)->withAddedHeader('location', $this->moduleUrl . '&show=' . (int)$actionId);
     }
 
     /**
@@ -480,7 +483,9 @@ class ActionTask implements TaskInterface
      */
     protected function isCreatedByUser(int $id, array $action)
     {
-        $record = BackendUtility::getRecord('be_users', $id, '*', ' AND cruser_id=' . $this->getBackendUser()->user['uid'] . ' AND createdByAction=' . $action['uid']);
+        //@TODO https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-98024-TCA-option-cruserid-removed.html
+        //$record = BackendUtility::getRecord('be_users', $id, '*', ' AND cruser_id=' . $this->getBackendUser()->user['uid'] . ' AND createdByAction=' . $action['uid']);
+        $record = BackendUtility::getRecord('be_users', $id, '*', ' AND createdByAction=' . $action['uid']);
         if (is_array($record)) {
             return $record;
         }
@@ -491,10 +496,10 @@ class ActionTask implements TaskInterface
      * Render all users who are created by the current BE user including a link to edit the record
      *
      * @param array $action sys_action record.
-     * @param int $selectedUser Id of a selected user
+     * @param string $selectedUser Id of a selected user
      * @return string html list of users
      */
-    protected function getCreatedUsers(array $action, int $selectedUser): string
+    protected function getCreatedUsers(array $action, string $selectedUser): string
     {
         $content = '';
         $userList = [];
@@ -510,10 +515,13 @@ class ActionTask implements TaskInterface
             ->select('*')
             ->from('be_users')
             ->where(
+                //@TODO https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-98024-TCA-option-cruserid-removed.html
+                /*
                 $queryBuilder->expr()->eq(
                     'cruser_id',
                     $queryBuilder->createNamedParameter($this->getBackendUser()->user['uid'], \PDO::PARAM_INT)
                 ),
+                */
                 $queryBuilder->expr()->eq(
                     'createdByAction',
                     $queryBuilder->createNamedParameter($action['uid'], \PDO::PARAM_INT)
@@ -590,7 +598,9 @@ class ActionTask implements TaskInterface
         $key = $vars['key'];
         $vars['password'] = trim($vars['password']);
         // Check if md5 is used as password encryption
-        if ($vars['password'] !== '' && strpos($GLOBALS['TCA']['be_users']['columns']['password']['config']['eval'], 'md5') !== false) {
+        
+        //@TODO https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Feature-97388-ConfigurablePasswordPolicies.html
+        if ($vars['password'] !== '' && strpos($GLOBALS['TCA']['be_users']['columns']['password']['config']['eval'] ?? '', 'md5') !== false) {
             $vars['password'] = md5($vars['password']);
         }
         $data = '';
@@ -676,7 +686,7 @@ class ActionTask implements TaskInterface
         if (is_array($appliedUsergroups)) {
             $cleanGroupList = [];
             // Create an array from the allowed usergroups using the uid as key
-            $allowedUsergroups = array_flip(explode(',', $actionRecord['t1_allowed_groups']));
+            $allowedUsergroups = array_flip(explode(',', $actionRecord['t1_allowed_groups'] ?? ''));
             // Walk through the array and check every uid if it is under the allowed ines
             foreach ($appliedUsergroups as $group) {
                 if (isset($allowedUsergroups[$group])) {
@@ -761,7 +771,8 @@ class ActionTask implements TaskInterface
                 'returnUrl' => $this->moduleUrl,
             ]
         );
-        HttpUtility::redirect($link);
+
+        $this->taskObject->getResponseFactory()->createResponse(303)->withAddedHeader('location', $link);
     }
 
     /**
@@ -828,11 +839,11 @@ class ActionTask implements TaskInterface
             $sql_query = unserialize($record['t2_data'] ?? '');
             if (!is_array($sql_query) || is_array($sql_query) && stripos(trim($sql_query['qSelect']), 'SELECT') === 0) {
                 $actionContent = '';
-                $type = $sql_query['qC']['search_query_makeQuery'];
-                if ($sql_query['qC']['labels_noprefix'] === 'on') {
+                $type = $sql_query['qC']['search_query_makeQuery'] ?? '';
+                if (($sql_query['qC']['labels_noprefix'] ?? '') === 'on') {
                     $this->taskObject->MOD_SETTINGS['labels_noprefix'] = 'on';
                 }
-                $sqlQuery = $sql_query['qSelect'];
+                $sqlQuery = $sql_query['qSelect'] ?? false;
                 $queryIsEmpty = false;
                 if ($sqlQuery) {
                     try {
@@ -910,7 +921,6 @@ class ActionTask implements TaskInterface
      */
     protected function viewRecordList(array $record): string
     {
-        debug();
         $content = '';
         $id = (int)$record['t3_listPid'];
         $table = $record['t3_tables'];
