@@ -104,7 +104,7 @@ class ActionTask implements TaskInterface
     public function getTask(): string
     {
         $content = '';
-        $show = (int)GeneralUtility::_GP('show');
+        $show = (int)($this->taskObject->getRequest()?->getQueryParams()['show'] ?? 0);
         foreach ($this->hookObjects as $hookObject) {
             if (method_exists($hookObject, 'getTask')) {
                 $show = $hookObject->getTask($show, $this);
@@ -168,6 +168,7 @@ class ActionTask implements TaskInterface
      */
     public function getOverview(): string
     {
+        $show = $this->taskObject->getRequest()?->getQueryParams()['show'] ?? '';
         $content = '<p>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:description')) . '</p>';
         // Get the actions
         $actionList = $this->getActions();
@@ -175,7 +176,7 @@ class ActionTask implements TaskInterface
             $items = '';
             // Render a single action menu item
             foreach ($actionList as $action) {
-                $active = GeneralUtility::_GP('show') === $action['uid'] ? 'active' : '';
+                $active = $show === $action['uid'] ? 'active' : '';
                 $items .= '<a class="list-group-item ' . $active . '" href="' . $action['link'] . '" title="' . htmlspecialchars($action['description']) . '">' . htmlspecialchars($action['title']) . '</a>';
             }
             $content .= '<div class="list-group">' . $items . '</div>';
@@ -395,17 +396,17 @@ class ActionTask implements TaskInterface
             }
             $content .= $this->renderFlashMessages();
         }
+        $beUsersUid = (int)($this->taskObject->getRequest()?->getQueryParams()['show'] ?? 0);
         // Load BE user to edit
-        if ((int)GeneralUtility::_GP('be_users_uid') > 0) {
-            $tmpUserId = (int)GeneralUtility::_GP('be_users_uid');
+        if ($beUsersUid > 0) {
             // Check if the selected user is created by the current user
-            $rawRecord = $this->isCreatedByUser($tmpUserId, $record);
+            $rawRecord = $this->isCreatedByUser($beUsersUid, $record);
             if ($rawRecord) {
                 // Delete user
-                if (GeneralUtility::_GP('delete') == 1) {
-                    $this->deleteUser($tmpUserId, $record['uid']);
+                if ((int)($this->taskObject->getRequest()?->getQueryParams()['delete'] ?? 0) == 1) {
+                    $this->deleteUser($beUsersUid, $record['uid']);
                 }
-                $key = $tmpUserId;
+                $key = $beUsersUid;
                 $vars = $rawRecord;
             }
         }
@@ -909,6 +910,7 @@ class ActionTask implements TaskInterface
      */
     protected function viewRecordList(array $record): string
     {
+        debug();
         $content = '';
         $id = (int)$record['t3_listPid'];
         $table = $record['t3_tables'];
@@ -935,7 +937,7 @@ class ActionTask implements TaskInterface
             $pageActionsInstruction->invoke('setPageId', $id);
         }
         $this->pageRenderer->getJavaScriptRenderer()->addJavaScriptModuleInstruction($pageActionsInstruction);
-
+        
         // If there is access to the page, then render the list contents and set up the document template object:
         if ($access) {
             $this->getLanguageService()->includeLLFile('EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf');
@@ -958,7 +960,7 @@ class ActionTask implements TaskInterface
             $dblist->disableSingleTableView = true;
             $dblist->pageRow = $pageinfo;
             // Initialize the listing object, dblist, for rendering the list:
-            $pointer = MathUtility::forceIntegerInRange(GeneralUtility::_GP('pointer'), 0, 100000);
+            $pointer = MathUtility::forceIntegerInRange((int)($this->taskObject->getRequest()?->getQueryParams()['pointer'] ?? 0), 0, 100000);
             $dblist->start($id, $table, $pointer);
             $dblist->setDispFields();
             // Render the list of tables:
