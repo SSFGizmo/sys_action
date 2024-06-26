@@ -34,11 +34,11 @@ use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -124,7 +124,7 @@ class ActionTask implements TaskInterface
                 $this->addMessage(
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error-not-found'),
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                    AbstractMessage::ERROR
+                    ContextualFeedbackSeverity::ERROR
                 );
             } else {
                 // Render the task
@@ -152,7 +152,7 @@ class ActionTask implements TaskInterface
                         $this->addMessage(
                             $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_noType'),
                             $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                            AbstractMessage::ERROR
+                            ContextualFeedbackSeverity::ERROR
                         );
                         $content .= $this->renderFlashMessages();
                 }
@@ -309,7 +309,7 @@ class ActionTask implements TaskInterface
             $this->addMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_not-found-description'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_not-found'),
-                AbstractMessage::INFO
+                ContextualFeedbackSeverity::INFO
             );
         }
         // Admin users can create a new action
@@ -348,7 +348,7 @@ class ActionTask implements TaskInterface
             $this->addMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
             $content .= $this->renderFlashMessages();
             return $content;
@@ -380,7 +380,7 @@ class ActionTask implements TaskInterface
                 $this->addMessage(
                     implode(LF, $errors),
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                    AbstractMessage::ERROR
+                    ContextualFeedbackSeverity::ERROR
                 );
             } else {
                 // Save user
@@ -861,7 +861,7 @@ class ActionTask implements TaskInterface
                     $this->addMessage(
                         $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_emptyQuery'),
                         $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                        AbstractMessage::ERROR
+                        ContextualFeedbackSeverity::ERROR
                     );
                     $content .= $this->renderFlashMessages();
                 }
@@ -886,7 +886,7 @@ class ActionTask implements TaskInterface
                 $this->addMessage(
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                    AbstractMessage::ERROR
+                    ContextualFeedbackSeverity::ERROR
                 );
                 $content .= $this->renderFlashMessages();
             }
@@ -895,7 +895,7 @@ class ActionTask implements TaskInterface
             $this->addMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_lowlevelMissing'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
             $content .= $this->renderFlashMessages();
         }
@@ -918,7 +918,7 @@ class ActionTask implements TaskInterface
             $this->addMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
             $content .= $this->renderFlashMessages();
             return $content;
@@ -973,7 +973,7 @@ class ActionTask implements TaskInterface
             $this->addMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error-access'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
             $content .= $this->renderFlashMessages();
         }
@@ -990,7 +990,7 @@ class ActionTask implements TaskInterface
     protected function addMessage(
         string $message,
         string $title = '',
-        $severity = AbstractMessage::OK)
+        $severity = ContextualFeedbackSeverity::OK)
     {
         $flashMessage = GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $severity);
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
