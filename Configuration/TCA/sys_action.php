@@ -26,6 +26,7 @@ return [
     'columns' => [
         'title' => [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.title',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.title.description',
             'config' => [
                 'type' => 'input',
                 'size' => 25,
@@ -36,6 +37,7 @@ return [
         ],
         'description' => [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.description',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.description.description',
             'config' => [
                 'type' => 'text',
                 'rows' => 10,
@@ -44,6 +46,7 @@ return [
         ],
         'hidden' => [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.enabled',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.hidden.description',
             'config' => [
                 'type' => 'check',
                 'renderType' => 'checkboxToggle',
@@ -57,6 +60,7 @@ return [
         ],
         'type' => [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.type',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.type.description',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
@@ -72,6 +76,7 @@ return [
         ],
         'assign_to_groups' => [
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.assign_to_groups',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.assign_to_groups.description',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectMultipleSideBySide',
@@ -87,6 +92,7 @@ return [
         ],
         't1_userprefix' => [
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_userprefix',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_userprefix.description',
             'config' => [
                 'type' => 'input',
                 'size' => 25,
@@ -96,6 +102,7 @@ return [
         ],
         't1_allowed_groups' => [
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_allowed_groups',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_allowed_groups.description',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectMultipleSideBySide',
@@ -109,6 +116,7 @@ return [
         't1_create_user_dir' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_create_user_dir',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_create_user_dir.description',
             'config' => [
                 'type' => 'check',
                 'renderType' => 'checkboxToggle',
@@ -121,6 +129,7 @@ return [
         ],
         't1_copy_of_user' => [
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_copy_of_user',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t1_copy_of_user.description',
             'config' => [
                 'type' => 'group',
                 'allowed' => 'be_users',
@@ -132,6 +141,7 @@ return [
         ],
         't3_listPid' => [
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t3_listPid',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t3_listPid.description',
             'config' => [
                 'type' => 'group',
                 'allowed' => 'pages',
@@ -143,6 +153,7 @@ return [
         ],
         't3_tables' => [
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t3_tables',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t3_tables.description',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
@@ -154,6 +165,7 @@ return [
         ],
         't4_recordsToEdit' => [
             'label' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t4_recordsToEdit',
+            'description' => 'LLL:EXT:sys_action/Resources/Private/Language/locallang_tca.xlf:sys_action.t4_recordsToEdit.description',
             'config' => [
                 'type' => 'group',
                 'allowed' => '*',
