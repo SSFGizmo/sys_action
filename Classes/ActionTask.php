@@ -841,7 +841,9 @@ class ActionTask implements TaskInterface
                 $actionContent = '';
                 $type = $sql_query['qC']['search_query_makeQuery'] ?? '';
                 if (($sql_query['qC']['labels_noprefix'] ?? '') === 'on') {
-                    $this->taskObject->MOD_SETTINGS['labels_noprefix'] = 'on';
+                    $modSettings = $this->taskObject->getModSettings();
+                    $modSettings['labels_noprefix'] = 'on';
+                    $this->taskObject->setModSettings($modSettings);
                 }
                 $sqlQuery = $sql_query['qSelect'] ?? false;
                 $queryIsEmpty = false;
@@ -851,9 +853,10 @@ class ActionTask implements TaskInterface
                             ->getConnectionForTable($sql_query['qC']['queryTable'])
                             ->executeQuery($sqlQuery)->fetchAllAssociative();
                         // Additional configuration
-                        $this->taskObject->MOD_SETTINGS['search_result_labels'] = $sql_query['qC']['search_result_labels'];
-                        $this->taskObject->MOD_SETTINGS['queryFields'] = $sql_query['qC']['queryFields'];
-
+                        $modSettings = $this->taskObject->getModSettings();
+                        $modSettings['search_result_labels'] = $sql_query['qC']['search_result_labels'];
+                        $modSettings['queryFields'] = $sql_query['qC']['queryFields'];
+                        $this->taskObject->setModSettings($modSettings);
                         $fullsearch = GeneralUtility::makeInstance(QueryView::class, $GLOBALS['SOBE']->MOD_SETTINGS);
                         $fullsearch->noDownloadB = 1;
                         $cP = $fullsearch->getQueryResultCode($type, $dataRows, $sql_query['qC']['queryTable']);
