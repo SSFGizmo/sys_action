@@ -169,7 +169,7 @@ class ActionTask implements TaskInterface
      */
     public function getOverview(): string
     {
-        $show = $this->taskObject->getRequest()?->getQueryParams()['show'] ?? '';
+        $show = $this->taskObject->getRequest()?->getQueryParams()['be_users_uid'] ?? '';
         $content = '<p>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:description')) . '</p>';
         // Get the actions
         $actionList = $this->getActions();
@@ -399,7 +399,7 @@ class ActionTask implements TaskInterface
             $content .= $this->renderFlashMessages();
         }
 
-        $beUsersUid = (int)($this->taskObject->getRequest()?->getQueryParams()['show'] ?? 0);
+        $beUsersUid = (int)($this->taskObject->getRequest()?->getQueryParams()['be_users_uid'] ?? 0);
         // Load BE user to edit
         if ($beUsersUid > 0) {
             // Check if the selected user is created by the current user
@@ -533,7 +533,7 @@ class ActionTask implements TaskInterface
 
         // Render the user records
         while ($row = $res->fetchAssociative()) {
-            $icon = '<span title="' . htmlspecialchars('uid=' . $row['uid']) . '">' . $this->iconFactory->getIconForRecord('be_users', $row, Icon::SIZE_SMALL)->render() . '</span>';
+            $icon = '<span title="' . htmlspecialchars('uid=' . $row['uid']) . '">' . $this->iconFactory->getIconForRecord('be_users', $row, Icon::SIZE_SMALL)->render() . '</span> ';
             $line = $icon . $this->action_linkUserName($row['username'], $row['realName'], $action['uid'], $row['uid']);
             // Selected user
             if ($row['uid'] == $selectedUser) {
