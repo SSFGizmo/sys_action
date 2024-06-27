@@ -18,6 +18,7 @@ namespace TYPO3\CMS\SysAction;
  */
 
 use Doctrine\DBAL\DBALException;
+use TYPO3\CMS\Backend\History\RecordHistory;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -368,7 +369,7 @@ class ActionTask implements TaskInterface
             if ($vars['key'] === 'NEW' && empty($vars['password'])) {
                 $errors[] = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:error-password-empty');
             }
-            if ($vars['key'] !== 'NEW' && !$this->isCreatedByUser($vars['key'], $record)) {
+            if ($vars['key'] !== 'NEW' && !$this->isCreatedByUser((int)$vars['key'], $record)) {
                 $errors[] = $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:error-wrong-user');
             }
             foreach ($this->hookObjects as $hookObject) {
@@ -585,6 +586,24 @@ class ActionTask implements TaskInterface
     }
 
     /**
+     * from ElementInformationController.php
+     */
+    protected function getRecordCreator(array $row)
+    {
+        $table = 'be_users';
+        $recordHistory = GeneralUtility::makeInstance(RecordHistory::class);
+        $ownerInformation = $recordHistory->getCreationInformationForRecord($table, $row);
+        $ownerUid = (int)(is_array($ownerInformation) && $ownerInformation['usertype'] === 'BE' ? $ownerInformation['userid'] : 0);
+        if ($ownerUid) {
+            $creatorRecord = BackendUtility::getRecord($table, $ownerUid);
+            if ($creatorRecord) {
+                return $creatorRecord;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Save/Update a BE user
      *
      * @param array $record Current action record
@@ -624,8 +643,8 @@ class ActionTask implements TaskInterface
             }
         } else {
             // Check ownership
-            $beRec = BackendUtility::getRecord('be_users', (int)$key);
-            if (is_array($beRec) && $beRec['cruser_id'] == $this->getBackendUser()->user['uid']) {
+            $recordCreator = $this->getRecordCreator(['uid' => (int)$key]);
+            if (is_array($recordCreator) && $recordCreator['uid'] == $this->getBackendUser()->user['uid']) {
                 $data = [];
                 $data['be_users'][$key]['username'] = $this->fixUsername($vars['username'], $record['t1_userprefix']);
                 if ($vars['password'] !== '') {
@@ -633,7 +652,7 @@ class ActionTask implements TaskInterface
                 }
                 $data['be_users'][$key]['realName'] = $vars['realName'];
                 $data['be_users'][$key]['email'] = $vars['email'];
-                $data['be_users'][$key]['disable'] = (int)$vars['disable'];
+                $data['be_users'][$key]['disable'] = (int)($vars['disable'] ?? 0);
                 $data['be_users'][$key]['admin'] = 0;
                 $data['be_users'][$key]['usergroup'] = $vars['usergroup'];
                 $newUserId = $key;
@@ -645,7 +664,7 @@ class ActionTask implements TaskInterface
             $dataHandler->start($data, [], $this->getBackendUser());
             $dataHandler->admin = true;
             $dataHandler->process_datamap();
-            $newUserId = (int)$dataHandler->substNEWwithIDs['NEW'];
+            $newUserId = (int)($dataHandler->substNEWwithIDs['NEW'] ?? false);
             if ($newUserId) {
                 // Create
                 $this->action_createDir($newUserId);
