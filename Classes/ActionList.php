@@ -73,11 +73,13 @@ class ActionList extends DatabaseRecordList
         if ((!$excludeList || !GeneralUtility::inList($excludeList, 'sortRev')) && $this->sortRev) {
             $urlParameters['sortRev'] = $this->sortRev;
         }
-        if (GeneralUtility::_GP('SET')) {
-            $urlParameters['SET'] = GeneralUtility::_GP('SET');
+        $set = $this->request->getQueryParams()['SET'] ?? $this->request->getParsedBody()['SET'] ?? false;
+        if ($set) {
+            $urlParameters['SET'] = $set;
         }
-        if (GeneralUtility::_GP('show')) {
-            $urlParameters['show'] = (int)GeneralUtility::_GP('show');
+        $show = $this->request->getQueryParams()['show'] ?? $this->request->getParsedBody()['show'] ?? 0;
+        if ($show) {
+            $urlParameters['show'] = (int)$show;
         }
         /** @var UriBuilder $uriBuilder */
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);

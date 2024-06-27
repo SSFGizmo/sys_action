@@ -988,13 +988,14 @@ class ActionTask implements TaskInterface
 
             // Initialize the dblist object:
             $dblist = GeneralUtility::makeInstance(ActionList::class);
+            $dblist->setRequest($this->taskObject->getRequest());
             $dblist->calcPerms = $pagePermissions;
             $dblist->disableSingleTableView = true;
             $dblist->pageRow = $pageinfo;
             // Initialize the listing object, dblist, for rendering the list:
             $pointer = MathUtility::forceIntegerInRange((int)($this->taskObject->getRequest()?->getQueryParams()['pointer'] ?? 0), 0, 100000);
             $dblist->start($id, $table, $pointer);
-            $dblist->setDispFields();
+            //$dblist->setDispFields(); //@TODO
             // Render the list of tables:
             $dblistContent = $dblist->generateList();
 
