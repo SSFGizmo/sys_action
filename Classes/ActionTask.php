@@ -20,6 +20,7 @@ namespace TYPO3\CMS\SysAction;
 use Doctrine\DBAL\DBALException;
 use TYPO3\CMS\Backend\History\RecordHistory;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Context\Context;
@@ -44,7 +45,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
-use TYPO3\CMS\Lowlevel\Database\QueryGenerator;
+use TYPO3\CMS\Lowlevel\Controller\DatabaseIntegrityController;
 use TYPO3\CMS\Taskcenter\Controller\TaskModuleController;
 use TYPO3\CMS\Taskcenter\TaskInterface;
 
@@ -876,8 +877,14 @@ class ActionTask implements TaskInterface
                         $modSettings['search_result_labels'] = $sql_query['qC']['search_result_labels'];
                         $modSettings['queryFields'] = $sql_query['qC']['queryFields'];
                         $this->taskObject->setModSettings($modSettings);
-                        $fullsearch = GeneralUtility::makeInstance(QueryGenerator::class, $this->taskObject->getModSettings());
-                        $fullsearch->noDownloadB = 1;
+                        $fullsearch = GeneralUtility::makeInstance(
+                            DatabaseIntegrityController::class,
+                            $this->iconFactory,
+                            GeneralUtility::makeInstance(UriBuilder::class),
+                            GeneralUtility::makeInstance(ModuleTemplateFactory::class),
+                            $this->taskObject->getModSettings());
+                        //$fullsearch->noDownloadB = 1; //@TODO
+                        /* @TODO
                         $cP = $fullsearch->getQueryResultCode($type, $dataRows, $sql_query['qC']['queryTable']);
                         $actionContent = $cP['content'];
                         // If the result is rendered as csv or xml, show a download link
@@ -885,6 +892,7 @@ class ActionTask implements TaskInterface
                             $actionContent .= '<a href="' . htmlspecialchars(GeneralUtility::getIndpEnv('REQUEST_URI') . '&download_file=1') . '">'
                                 . '<strong>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_download_file')) . '</strong></a>';
                         }
+                        */
                     } catch (DBALException $e) {
                         $actionContent .= $e->getMessage();
                     }
