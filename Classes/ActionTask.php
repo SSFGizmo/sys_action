@@ -28,7 +28,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\RootLevelRestriction;
-use TYPO3\CMS\Core\Database\QueryView;
 use TYPO3\CMS\Core\Database\RelationHandler;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Exception;
@@ -45,6 +44,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Lowlevel\Database\QueryGenerator;
 use TYPO3\CMS\Taskcenter\Controller\TaskModuleController;
 use TYPO3\CMS\Taskcenter\TaskInterface;
 
@@ -122,7 +122,7 @@ class ActionTask implements TaskInterface
             $record = BackendUtility::getRecord('sys_action', $show);
             // If the action is not found
             if (empty($record)) {
-                $this->addMessage(
+                $this->addFlashMessage(
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error-not-found'),
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                     ContextualFeedbackSeverity::ERROR
@@ -150,7 +150,7 @@ class ActionTask implements TaskInterface
                         $this->viewNewRecord($record);
                         break;
                     default:
-                        $this->addMessage(
+                        $this->addFlashMessage(
                             $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_noType'),
                             $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                             ContextualFeedbackSeverity::ERROR
@@ -307,7 +307,7 @@ class ActionTask implements TaskInterface
         if (!empty($actionList)) {
             $content .= $this->taskObject->renderListMenu($actionList);
         } else {
-            $this->addMessage(
+            $this->addFlashMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_not-found-description'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_not-found'),
                 ContextualFeedbackSeverity::INFO
@@ -346,7 +346,7 @@ class ActionTask implements TaskInterface
         $beRec = BackendUtility::getRecord('be_users', (int)$record['t1_copy_of_user']);
         // A record is need which is used as copy for the new user
         if (!is_array($beRec)) {
-            $this->addMessage(
+            $this->addFlashMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 ContextualFeedbackSeverity::ERROR
@@ -379,7 +379,7 @@ class ActionTask implements TaskInterface
             }
             // Show errors if there are any
             if (!empty($errors)) {
-                $this->addMessage(
+                $this->addFlashMessage(
                     implode(LF, $errors),
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                     ContextualFeedbackSeverity::ERROR
@@ -391,7 +391,7 @@ class ActionTask implements TaskInterface
                 $message = $vars['key'] === 'NEW'
                     ? $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:success-user-created')
                     : $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:success-user-updated');
-                $this->addMessage(
+                $this->addFlashMessage(
                     $message,
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:success')
                 );
@@ -876,7 +876,7 @@ class ActionTask implements TaskInterface
                         $modSettings['search_result_labels'] = $sql_query['qC']['search_result_labels'];
                         $modSettings['queryFields'] = $sql_query['qC']['queryFields'];
                         $this->taskObject->setModSettings($modSettings);
-                        $fullsearch = GeneralUtility::makeInstance(QueryView::class, $GLOBALS['SOBE']->MOD_SETTINGS);
+                        $fullsearch = GeneralUtility::makeInstance(QueryGenerator::class, $this->taskObject->getModSettings());
                         $fullsearch->noDownloadB = 1;
                         $cP = $fullsearch->getQueryResultCode($type, $dataRows, $sql_query['qC']['queryTable']);
                         $actionContent = $cP['content'];
@@ -891,7 +891,7 @@ class ActionTask implements TaskInterface
                 } else {
                     // Query is empty (not built)
                     $queryIsEmpty = true;
-                    $this->addMessage(
+                    $this->addFlashMessage(
                         $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_emptyQuery'),
                         $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                         ContextualFeedbackSeverity::ERROR
@@ -916,7 +916,7 @@ class ActionTask implements TaskInterface
                 $content .= '<h2>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_t2_result')) . '</h2>' . $actionContent;
             } else {
                 // Query is not configured
-                $this->addMessage(
+                $this->addFlashMessage(
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
                     $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                     ContextualFeedbackSeverity::ERROR
@@ -925,7 +925,7 @@ class ActionTask implements TaskInterface
             }
         } else {
             // Required sysext lowlevel is not installed
-            $this->addMessage(
+            $this->addFlashMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_lowlevelMissing'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 ContextualFeedbackSeverity::ERROR
@@ -947,7 +947,7 @@ class ActionTask implements TaskInterface
         $id = (int)$record['t3_listPid'];
         $table = $record['t3_tables'];
         if ($id == 0) {
-            $this->addMessage(
+            $this->addFlashMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_notReady'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 ContextualFeedbackSeverity::ERROR
@@ -1003,7 +1003,7 @@ class ActionTask implements TaskInterface
             $content .= '<form action="' . htmlspecialchars($dblist->listURL()) . '" method="post" name="dblistForm">' . $dblistContent . '<input type="hidden" name="cmd_table" /><input type="hidden" name="cmd" /></form>';
         } else {
             // Not enough rights to access the list view or the page
-            $this->addMessage(
+            $this->addFlashMessage(
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error-access'),
                 $this->getLanguageService()->sL('LLL:EXT:sys_action/Resources/Private/Language/locallang.xlf:action_error'),
                 ContextualFeedbackSeverity::ERROR
@@ -1020,7 +1020,7 @@ class ActionTask implements TaskInterface
      *
      * @throws Exception
      */
-    protected function addMessage(
+    protected function addFlashMessage(
         string $message,
         string $title = '',
         $severity = ContextualFeedbackSeverity::OK)

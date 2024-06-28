@@ -42,16 +42,8 @@ class ActionList extends DatabaseRecordList
         $excludeList = '')
     {
         $urlParameters = [];
-        if ((string)$alternativeId !== '') {
-            $urlParameters['id'] = $alternativeId;
-        } else {
-            $urlParameters['id'] = $this->id;
-        }
-        if ($table === '-1') {
-            $urlParameters['table'] = $this->table;
-        } else {
-            $urlParameters['table'] = $table;
-        }
+        $urlParameters['id'] = (string)$alternativeId !== '' ? $alternativeId : $this->id;
+        $urlParameters['table'] = $table === '-1' ? $this->table : $table;
         if ($this->returnUrl) {
             $urlParameters['returnUrl'] = $this->returnUrl;
         }
